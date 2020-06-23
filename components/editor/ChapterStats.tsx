@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 import { Button } from '../shared/forms';
+import { Chapter } from '../../lib/firebase';
 
 const ChapterStatsLayout = styled.div`
   color: #393939;
@@ -22,7 +23,7 @@ const ChapterStatsLayout = styled.div`
   }
 `;
 
-export default function ChapterStats() {
+export default function ChapterStats({ chapter }: { chapter: Chapter }) {
   return (
     <ChapterStatsLayout>
       <Button small hasIcon>
@@ -30,7 +31,12 @@ export default function ChapterStats() {
       </Button>
       <h4>Chapter Stats</h4>
       <ul>
-        <li>20 words</li>
+        <li>
+          {chapter
+            ? chapter.contents.trim().split(' ').filter(Boolean).length
+            : 0}{' '}
+          words
+        </li>
         <li>0 share snippets</li>
       </ul>
     </ChapterStatsLayout>

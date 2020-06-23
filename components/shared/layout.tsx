@@ -6,6 +6,9 @@ import { logout } from '../../lib/firebase';
 
 export const FlexLayout = styled.div`
   display: flex;
+  ${(props) => props.alignCenter && 'align-items: center;'}
+  ${(props) => props.alignStretch && 'align-items: stretch;'}
+  ${(props) => props.flexFill && 'flex-grow: 1'};
 `;
 
 export const FlexFillLayout = styled.div`

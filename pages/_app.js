@@ -2,6 +2,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
+import 'mobx-react-lite/batchingForReactDom';
 
 import { AppContainer, AppFooter } from '../components/shared/layout';
 import { authStore } from '../store';

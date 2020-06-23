@@ -1,7 +1,9 @@
 import styled from 'styled-components';
 
+import { Chapter } from '../../lib/firebase';
+
 const ChapterListLayout = styled.div`
-  min-width: 150px;
+  width: 160px;
   padding-left: 1.5em;
 
   h4 {
@@ -13,16 +15,37 @@ const ChapterListLayout = styled.div`
     margin: 0;
     padding: 0;
     color: #868686;
+    width: 100%;
   }
 `;
 
 const ChapterListItem = styled.li`
   position: relative;
-  padding: 0.2em 0;
   color: #868686;
   ${(props) => props.selected && 'font-weight: bold'};
   cursor: pointer;
   transition: color 0.3s ease;
+  width: 100%;
+
+  span {
+    display: inline-block;
+    max-width: 100%;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    padding-top: 0.6em;
+    overflow-x: hidden;
+  }
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -1.5em;
+    width: 4px;
+    height: 100%;
+    background: ${(props) => (props.selected ? 'orange' : 'transparent')};
+    transition: background 0.3s ease;
+  }
 
   &:hover {
     color: #232323;
@@ -31,23 +54,13 @@ const ChapterListItem = styled.li`
   & + & {
     margin-top: 0.5em;
   }
-
-  &:before {
-    content: '';
-    position: absolute;
-    height: 100%;
-    top: 0;
-    left: -1.5em;
-    border-right: 4px solid
-      ${(props) => (props.selected ? 'orange' : 'transparent')};
-    transition: border 0.3s ease;
-  }
 `;
 
 const NewChapterButton = styled.li`
   margin-top: 1em;
   display: inline-flex;
   align-items: center;
+  cursor: pointer;
 
   i {
     margin-right: 0.4em;
@@ -55,14 +68,16 @@ const NewChapterButton = styled.li`
 `;
 
 type ChapterListProps = {
-  chapters: string[];
+  chapters: Chapter[];
   onSelect: (number) => void;
-  selectedChapter: number;
+  onAddChapter: () => void;
+  selectedChapter: Chapter;
 };
 
 export default function ChapterList({
   chapters,
   onSelect,
+  onAddChapter,
   selectedChapter,
 }: ChapterListProps) {
   return (
@@ -71,14 +86,14 @@ export default function ChapterList({
       <ul>
         {chapters.map((chapter, index) => (
           <ChapterListItem
-            onClick={() => onSelect(index)}
-            key={index}
-            selected={index === selectedChapter}
+            onClick={() => onSelect(chapter)}
+            key={chapter.id}
+            selected={!!selectedChapter && chapter.id === selectedChapter.id}
           >
-            {chapter}
+            <span>{chapter.title || `New Chapter ${index + 1}`}</span>
           </ChapterListItem>
         ))}
-        <NewChapterButton>
+        <NewChapterButton onClick={onAddChapter}>
           <i className='ri-add-line' />
           <span>New Chapter</span>
         </NewChapterButton>
