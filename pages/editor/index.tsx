@@ -23,7 +23,10 @@ import {
   Chapter,
   addChapter,
   updateChapter,
-} from '../../lib/firebase';
+  addChapterContent,
+  updateChapterContent,
+  PartialChapter,
+} from '../../lib/whitespace';
 
 type EditorProps = { authStore: IAuthStore };
 
@@ -53,7 +56,7 @@ const Editor = ({ authStore: { user } }: EditorProps) => {
   );
 
   const handleContentChanged = useCallback(
-    (updatedContent) => {
+    (updatedContent: PartialChapter) => {
       if (!willSaveTimeout) {
         setWillSaveTimeout(setTimeout(() => setWillSave(true), 2000));
       }
@@ -65,16 +68,36 @@ const Editor = ({ authStore: { user } }: EditorProps) => {
     [selectedChapter, willSaveTimeout],
   );
 
+  const handleChapterContentAdded = useCallback(
+    async (type: 'text', content?: string) => {
+      const addedRef = await addChapterContent(
+        selectedStory.id,
+        selectedChapter.id,
+        {
+          type,
+          content: content,
+        },
+      );
+      return addedRef.id;
+    },
+    [],
+  );
+
   const handleContentSave = useCallback(
-    async ({ title, contents }) => {
+    async ({ id, title, contents }) => {
       if (selectedChapter && selectedStory) {
-        await updateChapter(
-          selectedStory.id,
-          selectedChapter.id,
-          title,
-          contents,
+        await updateChapter(selectedStory.id, id, title);
+        await Promise.all(
+          Object.keys(contents).map((contentId) =>
+            updateChapterContent(
+              selectedStory.id,
+              id,
+              contentId,
+              contents[contentId],
+            ),
+          ),
         );
-        await loadChapters();
+        await await loadChapters();
       }
     },
     [selectedChapter, selectedStory],
@@ -134,10 +157,11 @@ const Editor = ({ authStore: { user } }: EditorProps) => {
             onSelect={setSelectedChapter}
             onAddChapter={handleChapterAdded}
             selectedChapter={selectedChapter}
-          ></ChapterList>
+          />
           <ChapterContentEditor
             chapter={selectedChapter}
             onContentChanged={handleContentChanged}
+            onChapterContentAdded={handleChapterContentAdded}
           />
           <ChapterStats chapter={selectedChapter} />
         </FlexLayout>

@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 import { Button } from '../shared/forms';
-import { Chapter } from '../../lib/firebase';
+import { Chapter } from '../../lib/whitespace';
 
 const ChapterStatsLayout = styled.div`
   color: #393939;
