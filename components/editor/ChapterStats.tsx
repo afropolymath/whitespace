@@ -1,44 +1,46 @@
 import styled from 'styled-components';
+import { formatDistanceToNow } from 'date-fns';
 
-import { Button } from '../shared/forms';
 import { Chapter } from '../../lib/whitespace';
+import { FlexLayout } from '../shared/layout';
 
-const ChapterStatsLayout = styled.div`
+const ChapterStatsLayout = styled(FlexLayout)`
   color: #393939;
-  margin-top: 2em;
+  margin: 1em 0 1.5em 0;
 
-  h4 {
-    margin-top: 0;
-    margin-top: 2em;
-  }
-
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-
-    li + li {
-      margin-top: 0.5em;
-    }
+  span + span {
+    margin-left: 1.4em;
   }
 `;
 
 export default function ChapterStats({ chapter }: { chapter: Chapter }) {
-  return (
+  const chapterWordCount =
+    chapter && chapter.contents
+      ? (typeof chapter.contents === 'string'
+          ? chapter.contents
+          : Object.values(chapter.contents)
+              .reduce(
+                (allContents, contentBlock) => [
+                  ...allContents,
+                  contentBlock.content,
+                ],
+                [],
+              )
+              .join(' ')
+        )
+          .split(' ')
+          .filter(Boolean).length
+      : 0;
+  return chapter ? (
     <ChapterStatsLayout>
-      <Button small hasIcon>
-        <i className='ri-settings-5-fill' /> Story Settings
-      </Button>
-      <h4>Chapter Stats</h4>
-      <ul>
-        <li>
-          {chapter
-            ? chapter.contents.trim().split(' ').filter(Boolean).length
-            : 0}{' '}
-          words
-        </li>
-        <li>0 share snippets</li>
-      </ul>
+      <span>
+        Modified{' '}
+        {chapter.modified &&
+          formatDistanceToNow(chapter.modified, {
+            addSuffix: true,
+          })}
+      </span>
+      <span>{chapter ? chapterWordCount : 0} words</span>
     </ChapterStatsLayout>
-  );
+  ) : null;
 }

@@ -9,10 +9,13 @@ import {
   doc,
   QueryDocumentSnapshot,
   SnapshotOptions,
+  deleteDoc,
 } from 'firebase/firestore';
 
 import { db } from './firebase';
 import { authStore } from '../store';
+
+export type ContentBlockTypes = 'code' | 'text' | 'markdown';
 
 export type Story = {
   id: string;
@@ -21,23 +24,24 @@ export type Story = {
   modified: Date;
 };
 
-export type Chapter = {
-  id: string;
-  title: string;
-  contents: {
-    [contentId: string]: ChapterContent;
-  };
-  modified: Date;
-};
-
-export type ChapterContent = {
-  type: string;
-  content: string;
-};
-
 export type PartialChapter = {
   title: string;
   contents: null | { [key: string]: ChapterContent };
+};
+
+export type Chapter = PartialChapter & {
+  id: string;
+  modified: Date;
+};
+
+export type PartialChapterContent = {
+  type: ContentBlockTypes;
+  content: string;
+  index?: number;
+};
+
+export type ChapterContent = PartialChapterContent & {
+  id: string;
 };
 
 const storyConverter = {
@@ -49,12 +53,11 @@ const storyConverter = {
     options: SnapshotOptions,
   ): Story {
     const { title, description, modified } = snapshot.data(options)!;
-
     return {
       id: snapshot.id,
       title,
       description,
-      modified,
+      modified: modified?.toDate(),
     };
   },
 };
@@ -67,13 +70,30 @@ const chapterConverter = {
     snapshot: QueryDocumentSnapshot,
     options: SnapshotOptions,
   ): Chapter {
-    const { title, contents, modified } = snapshot.data(options)!;
-
+    const { title, contents, modified } = snapshot.data(options);
     return {
       id: snapshot.id,
       title,
       contents,
-      modified,
+      modified: modified?.toDate(),
+    };
+  },
+};
+
+const chapterContentConverter = {
+  toFirestore({ type, content, index }: ChapterContent) {
+    return { type, content, index };
+  },
+  fromFirestore(
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions,
+  ): ChapterContent {
+    const { type, content, index } = snapshot.data(options);
+    return {
+      id: snapshot.id,
+      type,
+      content,
+      index,
     };
   },
 };
@@ -93,6 +113,18 @@ export const getStoryChapters = async (storyId: string) => {
     query(collection(db, 'stories', storyId, 'chapters')).withConverter(
       chapterConverter,
     ),
+  );
+  return querySnapshot.docs.map((doc) => doc.data());
+};
+
+export const getChapterContents = async (
+  storyId: string,
+  chapterId: string,
+) => {
+  const querySnapshot = await getDocs(
+    query(
+      collection(db, 'stories', storyId, 'chapters', chapterId, 'contents'),
+    ).withConverter(chapterContentConverter),
   );
   return querySnapshot.docs.map((doc) => doc.data());
 };
@@ -133,16 +165,11 @@ export const updateStory = async (
  * @param contents Contents to be added to the chapter in the story
  * @returns
  */
-export const addChapter = async (
-  storyId: string,
-  title: string,
-  contents: string,
-) => {
+export const addChapter = async (storyId: string, title: string) => {
   const newChapterRef = await addDoc(
     collection(db, 'stories', storyId, 'chapters'),
     {
       title,
-      contents,
       created: serverTimestamp(),
       modified: serverTimestamp(),
     },
@@ -180,7 +207,7 @@ export const updateChapter = async (
 export const addChapterContent = async (
   storyId: string,
   chapterId: string,
-  chapterContent: ChapterContent,
+  chapterContent: PartialChapterContent,
 ) => {
   return await addDoc(
     collection(db, 'stories', storyId, 'chapters', chapterId, 'contents'),
@@ -203,7 +230,7 @@ export const updateChapterContent = async (
   storyId: string,
   chapterId: string,
   contentId: string,
-  chapterContent: ChapterContent,
+  chapterContent: PartialChapterContent,
 ) => {
   return await updateDoc(
     doc(db, 'stories', storyId, 'chapters', chapterId, 'contents', contentId),
@@ -211,5 +238,11 @@ export const updateChapterContent = async (
       ...chapterContent,
       modified: serverTimestamp(),
     },
+  );
+};
+
+export const deleteChapterContent = async (storyId, chapterId, contentId) => {
+  return await deleteDoc(
+    doc(db, 'stories', storyId, 'chapters', chapterId, 'contents', contentId),
   );
 };

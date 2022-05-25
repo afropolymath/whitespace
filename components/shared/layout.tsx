@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Link from 'next/link';
+import { User } from 'firebase/auth';
 
 import { LogoText } from './typography';
 import { logout } from '../../lib/firebase';
@@ -30,13 +31,6 @@ export const AppContainer = styled(VerticalLayout)`
   top: 0;
 `;
 
-export const PageLayout = styled.main`
-  width: 100%;
-  max-width: 960px;
-  padding: 2em;
-  box-sizing: border-box;
-`;
-
 export const AppFooter = styled.footer`
   height: 100px;
   line-height: 100px;
@@ -47,10 +41,7 @@ export const AppFooter = styled.footer`
 `;
 
 const Header = styled.header`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding: 1.2em 2em;
+  padding: 1.2em 0;
   box-sizing: border-box;
 `;
 
@@ -94,10 +85,10 @@ const EmailSpan = styled.span`
   color: #232323;
 `;
 
-export const AppHeader = ({ user }: { user: firebase.User }) => (
-  <Header>
+export const AppHeader = ({ user }: { user: User }) => (
+  <Header className='grid grid-cols-1 md:grid-cols-3'>
     <LogoText noMargins>Whitespace</LogoText>
-    <NavControls>
+    <NavControls className='md:col-span-2'>
       {user && (
         <NavItem>
           <Link href=''>

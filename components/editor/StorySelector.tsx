@@ -2,7 +2,8 @@ import styled from 'styled-components';
 import { useState, useRef, useCallback, useEffect } from 'react';
 
 import { FlexLayout } from '../shared/layout';
-import { Story } from '../../lib/firebase';
+import { Story } from '../../lib/whitespace';
+import { Loader } from '../shared/widgets/loader';
 
 const Card = styled.div`
   background: #ffffff;
@@ -149,11 +150,13 @@ export default function StorySelector({
   selectedStory,
   onAddStory,
   onSelectStory,
+  loading = false,
 }: {
   stories: Story[];
   selectedStory: null | Story;
   onAddStory: (storyTitle: string) => Promise<void>;
   onSelectStory: (story: Story) => void;
+  loading?: boolean;
 }) {
   const [titleInputCollapsed, setTitleInputCollapsed] = useState(true);
   const [searchWidgetVisible, setSearchWidgetVisible] = useState(false);
@@ -184,8 +187,18 @@ export default function StorySelector({
         flexFill
         onClick={() => setSearchWidgetVisible(!searchWidgetVisible)}
       >
-        <i className='ri-pencil-line'></i>
-        {selectedStory && <h4>{selectedStory.title}</h4>}
+        {loading ? (
+          <>
+            <Loader loadingText='Loading stories...' />
+          </>
+        ) : (
+          <>
+            <i className='ri-pencil-line'></i>
+            <h4>
+              {selectedStory ? selectedStory.title : 'Add a new story...'}
+            </h4>
+          </>
+        )}
       </FloatingControlClickHandle>
       {searchWidgetVisible && (
         <StorySearchWidget>

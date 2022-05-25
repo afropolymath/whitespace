@@ -2,10 +2,10 @@ import { useState, useRef } from 'react';
 import styled from 'styled-components';
 import 'mobx-react-lite/batchingForReactDom';
 
-import { VerticalLayout } from '../components/shared/layout';
 import { LogoText } from '../components/shared/typography';
 import { Button } from '../components/shared/forms';
 import { loginWithGoogle } from '../lib/firebase';
+import { FlexLayout } from '../components/shared/layout';
 
 const UIAppCard = styled.div`
   text-align: center;
@@ -61,7 +61,7 @@ export default function Home() {
   };
 
   return (
-    <VerticalLayout flexFill fillHorizontal>
+    <FlexLayout alignCenter flexFill as='main'>
       <UIAppCard>
         <LogoText>Whitespace</LogoText>
         <AppDescriptionText>
@@ -79,6 +79,6 @@ export default function Home() {
           {loginControlsVisible ? 'Cancel' : 'Login to get started'}
         </Button>
       </UIAppCard>
-    </VerticalLayout>
+    </FlexLayout>
   );
 }

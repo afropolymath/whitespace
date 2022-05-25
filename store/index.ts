@@ -1,9 +1,10 @@
 import { observable } from 'mobx';
+import { User } from 'firebase/auth';
 
 export interface IAuthStore {
-  user: firebase.User;
+  user: User;
   isLoggedIn: Boolean;
-  setUser: (user: firebase.User) => void;
+  setUser: (user: User) => void;
 }
 
 export const authStore: IAuthStore = observable<IAuthStore>({

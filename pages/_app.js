@@ -1,10 +1,13 @@
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 import 'mobx-react-lite/batchingForReactDom';
 
-import { AppContainer, AppFooter } from '../components/shared/layout';
+import {
+  AppFooter,
+  VerticalLayout,
+  FlexFillLayout,
+} from '../components/shared/layout';
 import { authStore } from '../store';
 import { withStore } from '../lib/utils';
 import { initializeAuthListener } from '../lib/firebase';
@@ -29,13 +32,10 @@ const MyApp = observer(({ Component, pageProps, authStore }) => {
   }, [authStore.isLoggedIn]);
 
   return (
-    <AppContainer fillVertical fillHorizontal as='main'>
-      <Head>
-        <title>Whitespace</title>
-      </Head>
+    <VerticalLayout fillHorizontal className='min-h-screen' as='main'>
       <Component {...pageProps} />
       <AppFooter>Built in 2020 by Chidiebere Nnadi.</AppFooter>
-    </AppContainer>
+    </VerticalLayout>
   );
 });
 

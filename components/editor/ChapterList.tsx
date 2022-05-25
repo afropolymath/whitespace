@@ -1,9 +1,8 @@
 import styled from 'styled-components';
 
-import { Chapter } from '../../lib/firebase';
+import { Chapter } from '../../lib/whitespace';
 
 const ChapterListLayout = styled.div`
-  width: 160px;
   padding-left: 1.5em;
 
   h4 {
@@ -81,7 +80,7 @@ export default function ChapterList({
   selectedChapter,
 }: ChapterListProps) {
   return (
-    <ChapterListLayout>
+    <ChapterListLayout className='md:col-span-1 lg:col-span-2'>
       <h4>Chapters</h4>
       <ul>
         {chapters.map((chapter, index) => (
