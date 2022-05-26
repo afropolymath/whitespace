@@ -32,7 +32,6 @@ export default class MyDocument extends Document {
     return (
       <Html>
         <Head>
-          <title>Whitespace</title>
           <meta name='viewport' content='initial-scale=1, width=device-width' />
         </Head>
         <body>
